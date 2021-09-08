@@ -55,7 +55,7 @@ and then we can fill proper flow values, e.g., with
 
 or, more interestingly, with some noise values. If you want to avoid collisions between flows, you can create an additional grid, perhaps with a coarser resolution, and use it to store occupancy values (e.g. 0 = free, 1 = occupied), and then check for collisions by doing occupancy tests.
 
-The following images were created using this approach and the Grid2D code: (1)[https://ipfs.io/ipfs/bafybeia2qire3dlli7vmrgzrssl2dl55adhwcaqeocxoz7j5j3t3msberi] and (2)[https://ipfs.io/ipfs/QmeSpajdK7SuhrLbyfzXpafytzYqqMvX7mhSesaKEAbBPj]
+The following images were created using this approach and the Grid2D code: ![1](https://ipfs.io/ipfs/bafybeia2qire3dlli7vmrgzrssl2dl55adhwcaqeocxoz7j5j3t3msberi] and ![2](https://ipfs.io/ipfs/QmeSpajdK7SuhrLbyfzXpafytzYqqMvX7mhSesaKEAbBPj)
 
 <img src="https://ipfs.io/ipfs/bafybeia2qire3dlli7vmrgzrssl2dl55adhwcaqeocxoz7j5j3t3msberi" alt="flow field example" width="300" height="150">
 <img src="https://ipfs.io/ipfs/QmeSpajdK7SuhrLbyfzXpafytzYqqMvX7mhSesaKEAbBPj" alt="flow field example" width="300" height="150">
