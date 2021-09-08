@@ -12,26 +12,26 @@ It is probably not comprehensive, or particularly well designed/implemented, but
 
 After importing the `Grid2D` class, you can create a new grid with 100 rows and 50 columns with:
 
-    const grid = new Grid2D(100,100);
+    const grid = new Grid2D(50,100);
 
 and, by default, all cells will be initialized with a 0 value. You can also set the initial value to some value `v` with
 
-    const grid = new Grid2D(100,100,v);
+    const grid = new Grid2D(50,100,v);
 
-You can set the value of certain cell with `grid.setValue( row, column, v);` and get a value with `grid.getValue(row, column)`.
+You can set the value of certain cell with `grid.setValue( row, column, v)` and get its value with `grid.getValue(row, column)`.
 
 Sometimes, it is useful to consider each cell as having a physical dimension, e.g. 20x20 pixels (or whatever unit of measurement). To create a grid of such kind, you can write
 
     const grid = new Grid2D(100,100,v, 20, 20);
 
 In this case, the grid has a width of 100 and an height of 100, and each cell is 20x20, so the grid has 5 rows and 5 columns (yes,
-dimensions default to 1, so, when you don't specify them, the first two parameter indicate width/number of columns and height/number of rows). Cell dimensions are useful for operations such as `getValueAtPoint(x,y)` `or getCellAtPoint(x,y)`. Suppose, for example, that your algorithm has to draw pixels on a 900x900 canvas, but has to reason with a grid of 100x100 cells, each 90x90 pixels. You can now, starting from the pixel coordinates, get the cell and its value.
+dimensions default to 1, so, when you don't specify them, the first two parameter indicate width/number of columns and height/number of rows). Cell dimensions are useful for operations such as `getValueAtPoint(x,y)` `or getCellAtPoint(x,y)`. Suppose, for example, that your algorithm has to draw pixels on a 900x900 canvas, but has to reason with a grid of 100x100 cells, each 90x90 pixels. You can use those functions to, starting from the pixel coordinates, get the cell and its value.
 
 Finally, you can position your grid in the 2D plane, or in the canvas:
 
     const grid = new Grid2D(100,100,v, 20, 20, 100, 100);
 
-i.e., a grid with width=100, height=100, with origin in (100, 100), where each cell is 20x20. The last two parameters default to 0.
+i.e., a grid with width=100, height=100, with origin in (100, 100), where each cell is 20x20. The last two parameters default to 0. The Y axis goes from top to bottom, as in p5.js.
 
 Additional methods include filling the grid using a function, checking if a condition is true for every/at least one cell neighbours, iterating over cells, performing a convolution with a 3x3 matrix (see code and its documentation).
 
@@ -55,7 +55,7 @@ and then we can fill proper flow values, e.g., with
 
 or, more interestingly, with some noise values. If you want to avoid collisions between flows, you can create an additional grid, perhaps with a coarser resolution, and use it to store occupancy values (e.g. 0 = free, 1 = occupied), and then check for collisions by doing occupancy tests.
 
-The following images were created using this approach and the Grid2D code:
+The following images were created using this approach and the Grid2D code: (1)[https://ipfs.io/ipfs/bafybeia2qire3dlli7vmrgzrssl2dl55adhwcaqeocxoz7j5j3t3msberi] and (2)[https://ipfs.io/ipfs/QmeSpajdK7SuhrLbyfzXpafytzYqqMvX7mhSesaKEAbBPj]
 
 <img src="https://ipfs.io/ipfs/bafybeia2qire3dlli7vmrgzrssl2dl55adhwcaqeocxoz7j5j3t3msberi" alt="flow field example" width="300" height="150">
 <img src="https://ipfs.io/ipfs/QmeSpajdK7SuhrLbyfzXpafytzYqqMvX7mhSesaKEAbBPj" alt="flow field example" width="300" height="150">
