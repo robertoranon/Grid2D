@@ -57,8 +57,8 @@ or, more interestingly, with some noise values. If you want to avoid collisions 
 
 The following images were created using this approach and the Grid2D code:
 
-<img src="https://ipfs.io/ipfs/bafybeia2qire3dlli7vmrgzrssl2dl55adhwcaqeocxoz7j5j3t3msberi" alt="flow field example" width="300" height="150">
-<img src="https://ipfs.io/ipfs/QmeSpajdK7SuhrLbyfzXpafytzYqqMvX7mhSesaKEAbBPj" alt="flow field example" width="300" height="150">
+<img src="https://ipfs.io/ipfs/bafybeia2qire3dlli7vmrgzrssl2dl55adhwcaqeocxoz7j5j3t3msberi" alt="flow field example" width="600" height="300">
+<img src="https://ipfs.io/ipfs/QmeSpajdK7SuhrLbyfzXpafytzYqqMvX7mhSesaKEAbBPj" alt="flow field example" width="600" height="300">
 
 Substrate by Jared Tarbell is another famous generative artwork based on a grid. I won't explain the whole algorith, but the basic building blocks are: - drawing lines (_cracks_ in Jared formulation) from a starting point, adding a few points per frame - check collisions of lines that we are drawing with other existing lines - draw new lines starting from points in existing lines, at 90 degrees wrt existing lines
 
