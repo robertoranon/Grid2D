@@ -62,7 +62,7 @@ export class Grid2D {
    * @param {*} value
    */
   setValue(row, col, value) {
-    if (cellExists(row, col)) {
+    if (this.cellExists(row, col)) {
       this.data[row][col] = value;
     }
   }
@@ -75,7 +75,7 @@ export class Grid2D {
    */
   getValueAtPoint(x, y) {
     const cell = this.getCellAtPoint(x, y);
-    if (cellExists(cell[0], cell[1])) {
+    if (this.cellExists(cell[0], cell[1])) {
       return this.getValue(cell[0], cell[1]);
     }
     return undefined;
