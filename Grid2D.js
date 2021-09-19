@@ -27,8 +27,8 @@ export class Grid2D {
     this.width = width;
     this.height = height;
     this.cellSize = [cellWidth, cellHeight];
-    this.num_columns = width / cellWidth;
-    this.num_rows = height / cellHeight;
+    this.num_columns = Math.floor(width / cellWidth);
+    this.num_rows = Math.floor(height / cellHeight);
 
     this.data = [];
 
@@ -134,9 +134,11 @@ export class Grid2D {
     const startColumn = col - distance > 0 ? col - distance : 0;
     const startRow = row - distance > 0 ? row - distance : 0;
     const endColumn =
-      col + distance > this.num_columns ? this.num_columns : col + distance;
+      col + distance >= this.num_columns
+        ? this.num_columns - 1
+        : col + distance;
     const endRow =
-      row + distance > this.num_rows ? this.num_rows : row + distance;
+      row + distance >= this.num_rows ? this.num_rows - 1 : row + distance;
     for (let r = startRow; r < endRow; r++) {
       for (let c = startColumn; c < endColumn; c++) {
         if (!condition(this.data[r][c])) {
