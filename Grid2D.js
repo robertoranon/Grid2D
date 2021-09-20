@@ -8,7 +8,6 @@
  * @param {Number} [cellHeight = 1] - height of a cell (in your own choice of units)
  * @param {Number} [left = 0] - x coordinate of left side  (in your own choice of units)
  * @param {Number} [top = 0] - y coordinate of top side (in your own choice of units)
- 
  */
 export class Grid2D {
   constructor(
@@ -37,7 +36,7 @@ export class Grid2D {
       const row = [];
       this.data.push(row);
       for (let c = 0; c < this.num_columns; c++) {
-        row.push(initialValue);
+        row.push(this.deepCopy(initialValue));
       }
     }
   }
@@ -106,7 +105,23 @@ export class Grid2D {
   }
 
   /**
-   * fills the grid using a function(row, column)
+   * Gets a point inside cell (row, col), displaced w_disp * cell_width and h_disp * cell_height from the cell top left corner
+   * @param {*} row
+   * @param {*} col
+   * @param {*} w_disp
+   * @param {*} h_disp
+   */
+  getCellPoint(row, col, w_disp, h_disp) {
+    const cellCenter = this.getCellCenter(row, col);
+    const displacement = [
+      (w_disp - 0.5) * this.cellSize[0],
+      (h_disp - 0.5) * this.cellSize[1],
+    ];
+    return [cellCenter[0] + displacement[0], cellCenter[1] + displacement[1]];
+  }
+
+  /**
+   * fills the grid using a function(row, column) that returns the value
    * @param {Function} Fn
    */
   fill(Fn) {
@@ -139,8 +154,8 @@ export class Grid2D {
         : col + distance;
     const endRow =
       row + distance >= this.num_rows ? this.num_rows - 1 : row + distance;
-    for (let r = startRow; r < endRow; r++) {
-      for (let c = startColumn; c < endColumn; c++) {
+    for (let r = startRow; r <= endRow; r++) {
+      for (let c = startColumn; c <= endColumn; c++) {
         if (!condition(this.data[r][c])) {
           return false;
         }
@@ -192,6 +207,22 @@ export class Grid2D {
   }
 
   /**
+   * returns the first cell indices for which condition(row, column) is true
+   * @param {*} condition
+   * @returns
+   */
+  findFirstCell(startRow, startColumn, condition) {
+    for (let r = startRow; r < this.num_rows; r++) {
+      for (let c = startColumn; c < this.num_columns; c++) {
+        if (condition(r, c)) {
+          return [r, c];
+        }
+      }
+    }
+    return undefined;
+  }
+
+  /**
    * returns true if the requested cell exists, false otherwise
    * @param {*} row
    * @param {*} col
@@ -237,5 +268,29 @@ export class Grid2D {
     sum += Fn(this.data[r + 1][c + 1]) * weights[8];
     //console.log(sum);
     return sum;
+  }
+
+  deepCopy(obj) {
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
+
+    if (obj instanceof Date) {
+      return new Date(obj.getTime());
+    }
+
+    if (obj instanceof Array) {
+      return obj.reduce((arr, item, i) => {
+        arr[i] = deepCopy(item);
+        return arr;
+      }, []);
+    }
+
+    if (obj instanceof Object) {
+      return Object.keys(obj).reduce((newObj, key) => {
+        newObj[key] = deepCopy(obj[key]);
+        return newObj;
+      }, {});
+    }
   }
 }
