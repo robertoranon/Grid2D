@@ -26,8 +26,8 @@ export class Grid2D {
     this.width = width;
     this.height = height;
     this.cellSize = [cellWidth, cellHeight];
-    this.num_columns = Math.floor(width / cellWidth);
-    this.num_rows = Math.floor(height / cellHeight);
+    this.num_columns = Math.ceil(width / cellWidth);
+    this.num_rows = Math.ceil(height / cellHeight);
 
     this.data = [];
 
@@ -48,7 +48,7 @@ export class Grid2D {
    * @return {*}
    */
   getValue(row, col) {
-    if (this.cellExists(row, col)) {
+    if (this.cellInGrid(row, col)) {
       return this.data[row][col];
     }
     return undefined;
@@ -61,7 +61,7 @@ export class Grid2D {
    * @param {*} value
    */
   setValue(row, col, value) {
-    if (this.cellExists(row, col)) {
+    if (this.cellInGrid(row, col)) {
       this.data[row][col] = value;
     }
   }
@@ -74,10 +74,30 @@ export class Grid2D {
    */
   getValueAtPoint(x, y) {
     const cell = this.getCellAtPoint(x, y);
-    if (this.cellExists(cell[0], cell[1])) {
+    if (cell !== undefined) {
       return this.getValue(cell[0], cell[1]);
     }
     return undefined;
+  }
+
+  /**
+   * sets value of the cell where the provided point is contained, if the cell exists in the grid
+   * @param {*} x
+   * @param {*} y
+   * @param {*} value
+   */
+  setValueAtPoint(x, y, value) {
+    const cell = this.getCellAtPoint(x, y);
+    if (cell !== undefined) {
+      this.setValue(cell[0], cell[1], value);
+    }
+  }
+
+  setValueInSegment(p1, p2, step, value) {
+    const cells = this.getCellsInSegment(p1, p2, step);
+    for (const cell of cells) {
+      this.setValue(cell[0], cell[1], value);
+    }
   }
 
   /**
@@ -87,9 +107,12 @@ export class Grid2D {
    * @returns {Number[]} -
    */
   getCellAtPoint(x, y) {
-    const column_index = Math.floor((x - this.left) / this.cellSize[0]);
-    const row_index = Math.floor((y - this.top) / this.cellSize[1]);
-    return [row_index, column_index];
+    if (this.pointInGrid(x, y)) {
+      const column_index = Math.floor((x - this.left) / this.cellSize[0]);
+      const row_index = Math.floor((y - this.top) / this.cellSize[1]);
+      return [row_index, column_index];
+    }
+    return undefined;
   }
 
   /**
@@ -98,10 +121,13 @@ export class Grid2D {
    * @param {Number} col
    */
   getCellCenter(row, col) {
-    return [
-      this.left + col * this.cellSize[0] + this.cellSize[0] / 2,
-      this.top + row * this.cellSize[1] + this.cellSize[1] / 2,
-    ];
+    if (this.cellInGrid(row, col)) {
+      return [
+        this.left + col * this.cellSize[0] + this.cellSize[0] / 2,
+        this.top + row * this.cellSize[1] + this.cellSize[1] / 2,
+      ];
+    }
+    return undefined;
   }
 
   /**
@@ -112,12 +138,15 @@ export class Grid2D {
    * @param {*} h_disp
    */
   getCellPoint(row, col, w_disp, h_disp) {
-    const cellCenter = this.getCellCenter(row, col);
-    const displacement = [
-      (w_disp - 0.5) * this.cellSize[0],
-      (h_disp - 0.5) * this.cellSize[1],
-    ];
-    return [cellCenter[0] + displacement[0], cellCenter[1] + displacement[1]];
+    if (this.pointInGrid(row, col)) {
+      const cellCenter = this.getCellCenter(row, col);
+      const displacement = [
+        (w_disp - 0.5) * this.cellSize[0],
+        (h_disp - 0.5) * this.cellSize[1],
+      ];
+      return [cellCenter[0] + displacement[0], cellCenter[1] + displacement[1]];
+    }
+    return undefined;
   }
 
   /**
@@ -163,6 +192,93 @@ export class Grid2D {
     }
     return true;
   }
+
+  /**
+   * Returns true if condition is true for all cells that contains points in the segment from (x1, y1) to (x2, y2)
+   * @param {*} p1
+   * @param {*} p2
+   * @param {*} condition
+   */
+  trueInASegment(p1, p2, step, condition) {
+    const cells = this.getCellsInSegment(p1, p2, step);
+    for (const cell of cells) {
+      if (!condition(this.data[cell[0]][cell[1]])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  getCellsInSegment(p1, p2, step) {
+    const result = [];
+    // calculate dx , dy
+    const dx = p2[0] - p1[0];
+    const dy = p2[1] - p1[1];
+
+    // Depending upon absolute value of dx & dy
+    // choose number of steps to put pixel as
+    // steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy)
+    const steps =
+      Math.abs(dx) > Math.abs(dy)
+        ? Math.abs(dx) / this.cellSize[0]
+        : Math.abs(dy) / this.cellSize[1];
+
+    // calculate increment in x & y for each steps
+    const Xinc = dx / steps;
+    const Yinc = dy / steps;
+
+    // Put pixel for each step
+    let X = p1[0];
+    let Y = p1[1];
+
+    for (let i = 0; i <= steps; i++) {
+      const cell = this.getCellAtPoint(X, Y);
+      if (cell != undefined) {
+        result.push(cell);
+      }
+
+      X += Xinc;
+      Y += Yinc;
+    }
+    return result;
+  }
+
+  /* getCellsInSegment(p1, p2, step) {
+    const result = [];
+    const pmin = p1[0] <= p2[0] ? p1 : p2;
+    const pmax = p1[0] <= p2[0] ? p2 : p1;
+    let m = (pmax[1] - pmin[1]) / (pmax[0] - pmin[0]);
+    if (Math.cos(m) < 0) {
+      m -= Math.PI;
+    }
+    const startCell = this.getCellAtPoint(pmin[0], pmin[1]);
+    if (this.cellInGrid(startCell[0], startCell[1])) {
+      result.push(startCell);
+    }
+
+    // now we should move along the line until we change row or column, but for now, we'll use the step
+    let p = [pmin[0] + step * Math.cos(m), pmin[1] + step * Math.sin(m)];
+    while (p[0] <= pmax[0]) {
+      const cell = this.getCellAtPoint(p[0], p[1]);
+      if (
+        this.cellInGrid(cell[0], cell[1]) &&
+        (cell[0] !== result[result.length - 1][0] ||
+          cell[1] !== result[result.length - 1][1])
+      ) {
+        result.push(cell);
+      }
+      p = [p[0] + step * Math.cos(m), p[1] + step * Math.sin(m)];
+    }
+    const endCell = this.getCellAtPoint(pmax[0], pmax[1]);
+    if (
+      (this.cellInGrid(endCell[0], endCell[1]) &&
+        endCell[0] !== result[result.length - 1][0]) ||
+      endCell[1] !== result[result.length - 1][1]
+    ) {
+      result.push(endCell);
+    }
+    return result;
+  } */
 
   /**
    * Returns true if the provided condition is true for at least one neighbour cell, using
@@ -227,9 +343,18 @@ export class Grid2D {
    * @param {*} row
    * @param {*} col
    */
-  cellExists(row, col) {
+  cellInGrid(row, col) {
     return (
       row >= 0 && row < this.num_rows && col >= 0 && col < this.num_columns
+    );
+  }
+
+  pointInGrid(x, y, margin = 0) {
+    return (
+      x >= this.left + margin &&
+      x <= this.right - margin &&
+      y >= this.top + margin &&
+      y <= this.bottom - margin
     );
   }
 
